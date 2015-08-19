@@ -11,10 +11,17 @@ window.Alone = function(dll, otherKey) {
 
     this.dllData = [];
 
+    //this.dllData = [
+    //    [{"id": 0, "name": "size1"},{"id": 0, "name": "size1"}],
+    //    [{"id": 0, "name": "size1"},{"id": 0, "name": "size1"}]
+    //];
+
     this.results = [];
     //this.results = [
     //    {key: "0_0_0", keyValues: [red, spec1, size1], values: [1, 3, 4]}
     //];
+
+    this.resultsCache = [];
 
 }
 // 方法
@@ -31,7 +38,10 @@ Alone.prototype.setDllData = function () {
         var cells = cate.items;
         for(var j = 0; j < cells.length; j++) {
             if(cells[j].enable) {
-                tempDllData[i].push(cells[j].name);
+                var cell = {};
+                cell.id = cells[j].id;
+                cell.name = cells[j].name;
+                tempDllData[i].push(cell);
             }
         }
     }
@@ -44,51 +54,53 @@ Alone.prototype.setResults = function(data) {
     var n = data.length,
         stack = [];
     var html = '';
-    var tempResults = [];
+    var tempResults = this.results;
     var setRowData = function(l) {
         if(l == n){
             var rowData = {};
-            var rowVals = rowData.values = [];
+            var rowKeys = [];
+            var rowVals  = [];
 
             // 根据dllData的数据生成组合key值
             var key = '';
             for(var i = 0; i < n; i++) {
-                key += '_' + stack[i].index;
+                key += '_' + stack[i].id;
             }
             key = key.replace(/^_/, '');
             rowData.key = key;
 
             // 将唯独单元值存入结果的行数据
             for(var i = 0; i < stack.length; i++) {
-                rowVals.push(stack[i].value);
+                rowKeys.push(stack[i].name);
             }
-
-            var results = other.results;
-            for(var i = 0; i < results.length; i++) {
+            rowData.keyValues = rowKeys;
+            // 将id做比较，比较内容时候一样
+            var resultsCache = other.resultsCache;
+            for(var i = 0; i < resultsCache.length; i++) {
                 // 如果该key值下的value有值就还原
-                if(results[i].key == key) {
-                    var values = results[i].values;
+                if(resultsCache[i].key == key) {
+                    var values = resultsCache[i].values;
                     for(var idx in values) {
-                        if(idx >= stack.length) {
-                            rowVals.push(values[idx]);
-                        }
+                        rowVals.push(values[idx]);
                     }
+                    rowData.values = rowVals;
                     tempResults.push(rowData);
                     return;
                 }
             }
 
+
             for(var i = 0; i < other.otherKey.length; i++) {
                 rowVals.push("");
             }
-
+            rowData.values = rowVals;
             tempResults.push(rowData);
             return;
         }
 
         var j = data[l].length;
         for(i = 0; i < j; i++) {
-            stack[l] = {'index' : i, 'value' : data[l][i]};
+            stack[l] = {'id' : data[l][i].id, 'name' : data[l][i].name};
             setRowData(l + 1);
         }
     }
@@ -131,7 +143,8 @@ Alone.prototype.eventBind = function () {
         if(val != "" && val != null) {
             var cate = $(this).parents(".cate-box");
             var idx = cate.attr("data-cata-index");
-            other.dll[idx].items.push({'name': val, 'enable': false});
+            var cells = other.dll[idx].items;
+            cells.push({'id': cells.length,'name': val, 'enable': false});
             other.render();
         }
     });
@@ -143,8 +156,8 @@ Alone.prototype.eventBind = function () {
     });
 
     $(".cell-cont [type='checkbox'], " +
-        ".cell-cont .cell-edit, " +
-        ".cate-name").change(function () {
+    ".cell-cont .cell-edit, " +
+    ".cate-name").change(function () {
         var cate, idxI, cell, idxJ;
         cate = $(this).parents(".cate-box");
         idxI = cate.attr("data-cata-index");
@@ -174,7 +187,7 @@ Alone.prototype.eventBind = function () {
             }
         }
     });
-    
+
     $(".btn-add-cate").click(function () {
         var cata = {};
         cata.name = "";

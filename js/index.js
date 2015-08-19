@@ -4,28 +4,28 @@
 
 $(document).ready(function () {
     var dll = [
-        {
-            name : 'Color',
-            items : [
-                {'name' : 'red', 'enable' : true},
-                {'name' : 'green', 'enable' : true},
-                {'name' : 'orange', 'enable' : true}
-            ]
-        },
+        //{
+        //    name : 'Color',
+        //    items : [
+        //        {'id': 0, 'name' : 'red', 'enable' : true},
+        //        {'id': 1, 'name' : 'green', 'enable' : true},
+        //        {'id': 2, 'name' : 'orange', 'enable' : true}
+        //    ]
+        //},
         {
             name : 'Spec',
             items : [
-                {'name' : 'spec1', 'enable' : true},
-                {'name' : 'spec2', 'enable' : true},
-                {'name' : 'spec3', 'enable' : false}
+                {'id': 0, 'name' : 'spec1', 'enable' : true},
+                {'id': 1, 'name' : 'spec2', 'enable' : true},
+                {'id': 2, 'name' : 'spec3', 'enable' : false}
             ]
         },
         {
             name : 'Size',
             items : [
-                {'name' : 'size1', 'enable' : true},
-                {'name' : 'size2', 'enable' : true},
-                {'name' : 'size3', 'enable' : false}
+                {'id': 0, 'name' : 'size1', 'enable' : true},
+                {'id': 1, 'name' : 'size2', 'enable' : true},
+                {'id': 2, 'name' : 'size3', 'enable' : false}
             ]
         }
     ];

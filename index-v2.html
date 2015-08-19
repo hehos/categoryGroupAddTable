@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <!--<link rel="stylesheet" href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css">-->
+    <link rel="stylesheet" href="css/bootstrap.css"/>
+    <link rel="stylesheet" href="css/index.css"/>
+
+    <script src="http://libs.baidu.com/jquery/1.11.1/jquery.min.js"></script>
+    <script src="js/laytpl.js"></script>
+
+    <script src="js/base-v2.js"></script>
+    <script src="js/index.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <br><br><br>
+
+
+    <script id="config-template" type="text/html">
+        <div class="config-goods">
+            <input name="dll" type="hidden" data-dll />
+            <input name="results" type="hidden" data-results />
+            {{#
+            var i, j, len, len2;
+            var dll = d.dll;
+            var dllData = d.dllData;
+            var otherKey = d.otherKey;
+            var results = d.results;
+            }}
+            {{# for(i = 0, len = dll.length; i < len; i++) { }}
+            <div class="cate-box" data-cata-index="{{ i }}">
+                <div class="pull-left">
+                    <input class="cate-name" type="text" value="{{ dll[i].name }}"/>
+                </div>
+                <ul class="items-cont col-md-3">
+                    {{#
+                    for(j = 0, len2 = dll[i].items.length; j < len2; j++) {
+                    var checked = dll[i].items[j].enable;
+                    var cell = dll[i].items[j];
+                    }}
+                    <li class="cell-cont" data-cell-index="{{ j }}">
+                        <label>
+                            <input type="checkbox" {{ checked ? "checked" : "" }} />
+                            <span class="cell-txt" style="display: {{ checked ? 'none;' : 'inline-block;' }}">{{ cell.name }}</span>
+                            <input style="display: {{ checked ? 'inline-block;' : 'none;' }}"
+                                   class="cell-edit" type="text" value="{{ cell.name }}" />
+                        </label>
+                    </li>
+                    {{# } }}
+
+                    <li class="ctrl-form">
+                        <div class="btn-add-inputs">
+                            <input class="btn-add-input" type="text"/>
+                            <button class="btn-confirm btn btn-info">确定</button>
+                            <button class="btn-cancel btn btn-warning">取消</button>
+                        </div>
+                        <button class="btn-add-cell btn btn-default">添加规格值</button>
+                    </li>
+                </ul>
+            </div>
+            {{# } }}
+
+            <button class="btn-add-cate btn btn-default" type="button">添加唯独类别</button>
+
+            {{# if(results.length !=0) { }}
+            <div class="cate-group-result">
+                <div class="pull-left">
+                    库存配置
+                </div>
+                <table>
+                    <thead>
+                    <tr>
+                        {{# for(i = 0, len = dll.length; i < len; i++){ }}
+                        <th>{{ dll[i].name }}</th>
+                        {{# } }}
+
+                        {{# for(i = 0, len = otherKey.length; i < len; i++){ }}
+                        <th><span>*</span>{{ otherKey[i] }}<i class="glyphicon glyphicon-pencil"></i></th>
+                        {{# } }}
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {{# for(i = 0, len = results.length; i < len; i++){ }}
+                    <tr data-result-row="{{ i }}" data-result-key="{{ results[i].key }}">
+                        {{#
+                        var keys = results[i].keyValues;
+                        var cells = results[i].values;
+                        }}
+                        {{# for(j = 0, len2 = keys.length; j < len2; j++) { }}
+                        <td data-result-key="{{ j }}">
+                            {{ keys[j] }}
+                        </td>
+                        {{# } }}
+                        {{# for(j = 0, len2 = cells.length; j < len2; j++) { }}
+                        <td data-result-cell="{{ j }}">
+                            <input type="text" value="{{ cells[j] }}"/>
+                        </td>
+                        {{# } }}
+                    </tr>
+                    {{# } }}
+
+                    </tbody>
+                </table>
+            </div>
+            {{# } }}
+        </div>
+    </script>
+    <div id="config-view">
+
+    </div>
+
+
+</div>
+
+</body>
+</html>
