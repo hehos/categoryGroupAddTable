@@ -1,125 +1,25 @@
 "use strict";
+
 /**
  * Created by hui on 2015/8/18.
  */
 
-window.Alone = function() {
+window.Alone = function(dll, otherKey) {
     // data
-    this.dll = [
-        {
-            name : 'Color',
-            items : [
-                {'name' : 'red', 'enable' : true},
-                {'name' : 'green', 'enable' : true},
-                {'name' : 'orange', 'enable' : true}
-            ]
-        },
-        {
-            name : 'Spec',
-            items : [
-                {'name' : 'spec1', 'enable' : true},
-                {'name' : 'spec2', 'enable' : true},
-                {'name' : 'spec3', 'enable' : false}
-            ]
-        },
-        {
-            name : 'Size',
-            items : [
-                {'name' : 'size1', 'enable' : true},
-                {'name' : 'size2', 'enable' : true},
-                {'name' : 'size3', 'enable' : false}
-            ]
-        }
-    ];
-    this.otherKey = ["市场价", "价格", "库存", "预警值", "商家货号"];
+    this.dll = dll;
+    this.otherKey = otherKey;
 
-    this.dllData = [
-        ['red',  'green', 'orange'],
-        ['spec1',  'spec2'],
-        ['size1',  'size2']
-    ];
-    this.values = {
-        '0_0_0' :  {'price' : '100', 'price2' : '101'},
-        '0_0_1' :  {'price' : '200', 'price2' : '201'}
-    };
+    this.dllData = [];
 
     this.results = [];
+    //this.results = [
+    //    {key: "0_0_0", values: [1, 3, 4]}
+    //];
+
 }
 // 方法
-Alone.prototype.loopN = function(data, values) {
-    var other = this;
-    var head = '';
-    var n = data.length,
-        stack = [];
-    var html = '';
-    var results = [];
-    var render = function(l) {
-        if(l == n){
-            var resultEle = [];
-            for(var i = 0; i < stack.length; i++) {
-                resultEle.push(stack[i].value);
-            }
-
-            var key = '';
-            for(var i = 0; i < n; i++) {
-                key += '_' + stack[i].index;
-            }
-            key = key.replace(/^_/, '');
-
-            var vals = values[key];
-            var otherVal = [];
-            if(vals) {
-                for (key in vals) {
-                    otherVal.push(vals[key]);
-                }
-            }
-            for(var i = 0; i < other.otherKey.length; i++) {
-                var otherCellVal = otherVal[i];
-                otherCellVal? resultEle.push(otherVal[i]) : resultEle.push(" ");
-            }
-
-            results.push(resultEle);
-            return;
-        }
-
-        var j = data[l].length;
-        for(i = 0; i < j; i++) {
-            stack[l] = {'index' : i, 'value' : data[l][i]};
-            render(l + 1);
-        }
-    }
-    render(0);
-    this.results = results;
-    console.log(this.results);
-}
-Alone.prototype.render = function() {
-    var other = this;
-    this.loopN(this.dllData, this.values);
-
-
-    var gettpl = document.getElementById('config-template').innerHTML;
-    laytpl(gettpl).render(other, function(html){
-        document.getElementById('config-view').innerHTML = html;
-    });
-}
-
 Alone.prototype.setDll = function(dll) {
-    var cates = $(".cate-box");
-    var tempDll = [];
-    for(var i = 0; i < cates.length; i++) {
-        tempDll.push({});
-        tempDll[i].name = cates.find(".cate-name").val();
-        tempDll[i].items = [];
-        var cells = cates.find(".cell-cont");
-        for(var j = 0; j < cells.length; j++) {
-            tempDll[i].items.push({});
-            var cellObj = tempDll[i].items[j];
-            var cellDom = $(cells[j]);
-            cellObj.name = cellDom.find("span").text();
-            cellObj.enable = cellDom.find("input")[0].checked;
-        }
-    }
-    this.dll = tempDll;
+    this.dll = dll;
 }
 
 Alone.prototype.setDllData = function () {
@@ -135,18 +35,163 @@ Alone.prototype.setDllData = function () {
             }
         }
     }
+    debugger;
     this.dllData = tempDllData;
 }
 
-// todo
-Alone.prototype.setValues = function () {
+Alone.prototype.setResults = function(data) {
+    var other = this;
+    var head = '';
+    var n = data.length,
+        stack = [];
+    var html = '';
+    var tempResults = [];
+    var setRowData = function(l) {
+        if(l == n){
+            var rowData = {};
+            var rowVals = rowData.values = [];
 
+            // 根据dllData的数据生成组合key值
+            var key = '';
+            for(var i = 0; i < n; i++) {
+                key += '_' + stack[i].index;
+            }
+            key = key.replace(/^_/, '');
+            rowData.key = key;
+
+            var results = other.results;
+            for(var i = 0; i < results.length; i++) {
+                // 如果该key值下的value有值就还原
+                if(results[i].key == key) {
+                    var values = results[i].values;
+                    for(var idx in values) {
+                        rowVals.push(values[idx]);
+                    }
+                    tempResults.push(rowData);
+                    return;
+                }
+            }
+
+            // 将唯独单元值存入结果的行数据
+            for(var i = 0; i < stack.length; i++) {
+                rowVals.push(stack[i].value);
+            }
+            for(var i = 0; i < other.otherKey.length; i++) {
+                rowVals.push("");
+            }
+
+            tempResults.push(rowData);
+            return;
+        }
+
+        var j = data[l].length;
+        for(i = 0; i < j; i++) {
+            stack[l] = {'index' : i, 'value' : data[l][i]};
+            setRowData(l + 1);
+        }
+    }
+    setRowData(0);
+    this.results = tempResults;
 }
+
+Alone.prototype.setHiddenData = function () {
+    $("[data-dll]").val(JSON.stringify(this.dll));
+    $("[data-results]").val(JSON.stringify(this.results));
+}
+
+Alone.prototype.render = function() {
+    var other = this;
+    this.setDllData();
+    this.setResults(this.dllData);
+
+    var gettpl = document.getElementById('config-template').innerHTML;
+    laytpl(gettpl).render(other, function(html){
+        document.getElementById('config-view').innerHTML = html;
+    });
+    other.eventBind();
+
+    other.setHiddenData();
+}
+
 
 // event （事件）
-Alone.prototype.cateWatch = function () {
-    $(".cate-box input")
-}
-Alone.prototype.cellWatch = function () {
+Alone.prototype.eventBind = function () {
+    var other = this;
 
+    // cell 事件
+    $(".btn-add-cell").click(function () {
+        $(this).hide();
+        $(this).siblings().show();
+    });
+    $(".btn-confirm").click(function() {
+        var input = $(this).siblings(".btn-add-input");
+        var val = input.val().trim();
+        if(val != "" && val != null) {
+            var cate = $(this).parents(".cate-box");
+            var idx = cate.attr("data-cata-index");
+            other.dll[idx].items.push({'name': val, 'enable': false});
+            other.render();
+        }
+    });
+    $(".btn-confirm, .btn-cancel").click(function () {
+        var inputs = $(this).parents(".btn-add-inputs");
+        var addCateBtn = inputs.siblings(".btn-add-cell");
+        inputs.hide();
+        addCateBtn.show();
+    });
+
+
+    function getCellIdx(obj) {
+        var cate, idxI, cell, idxJ;
+        cate = $(obj).parents(".cate-box");
+        idxI = cate.attr("data-cata-index");
+        cell = $(obj).parents(".cell-cont");
+        idxJ = cell.attr("data-cell-index");
+    }
+    $(".cell-cont [type='checkbox'], " +
+        ".cell-cont .cell-edit, " +
+        ".cate-name").change(function () {
+        var cate, idxI, cell, idxJ;
+        cate = $(this).parents(".cate-box");
+        idxI = cate.attr("data-cata-index");
+        cell = $(this).parents(".cell-cont");
+        idxJ = cell.attr("data-cell-index");
+
+        var cln = $(this).attr("class");
+        if(this.type == "checkbox") {
+            if(this.checked) {
+                other.dll[idxI].items[idxJ].enable = true;
+                other.render();
+            } else {
+                other.dll[idxI].items[idxJ].enable = false;
+                other.render();
+            }
+        }
+        if(cln != undefined) {
+            if(cln.search("cell-edit") != -1) {
+                var val = $(this).val().trim();
+                other.dll[idxI].items[idxJ].name = val;
+                other.render();
+            }
+            if(cln.search("cate-name") != -1) {
+                var val = $(this).val().trim();
+                other.dll[idxI].name = val;
+                other.render();
+            }
+        }
+    });
+
+    // 表格表单数据监听
+    $(".cate-group-result tbody input").change(function () {
+        var row, rowI, cell, cellJ;
+        row = $(this).parents("[data-result-row]");
+        rowI = row.attr("data-result-row");
+        cell = $(this).parents("[data-result-cell]");
+        cellJ = cell.attr("data-result-cell");
+
+        var val = $(this).val();
+        other.results[rowI].values[cellJ] = val;
+        other.render();
+        console.log(other.results);
+    });
 }

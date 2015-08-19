@@ -3,51 +3,35 @@
  */
 
 $(document).ready(function () {
-    var alone = new Alone();
+    var dll = [
+        {
+            name : 'Color',
+            items : [
+                {'name' : 'red', 'enable' : true},
+                {'name' : 'green', 'enable' : true},
+                {'name' : 'orange', 'enable' : true}
+            ]
+        },
+        {
+            name : 'Spec',
+            items : [
+                {'name' : 'spec1', 'enable' : true},
+                {'name' : 'spec2', 'enable' : true},
+                {'name' : 'spec3', 'enable' : false}
+            ]
+        },
+        {
+            name : 'Size',
+            items : [
+                {'name' : 'size1', 'enable' : true},
+                {'name' : 'size2', 'enable' : true},
+                {'name' : 'size3', 'enable' : false}
+            ]
+        }
+    ];
 
+    var otherKey = ["市场价", "价格", "库存", "预警值", "商家货号"];
+
+    var alone = new Alone(dll, otherKey);
     alone.render();
-
-    $(".btn-add-cate").click(function () {
-        $(this).hide();
-        $(this).siblings().show();
-    });
-    $(".btn-confirm").click(function() {
-        var input = $(this).siblings(".btn-add-input");
-        var val = input.val().trim();
-        if(val != "" && val != null) {
-            var cate = $(this).parents(".cate-box");
-            var idx = cate.attr("data-cata-index");
-            alone.dll[idx].items.push({'name': val, 'enable': false});
-            alone.render();
-        }
-    });
-    $(".btn-confirm, .btn-cancel").click(function () {
-        var inputs = $(this).parents(".btn-add-inputs");
-        var addCateBtn = inputs.siblings(".btn-add-cate");
-        inputs.hide();
-        addCateBtn.show();
-    });
-
-
-    // cell 事件
-    $(".cell-cont [type='checkbox']").change(function () {
-        var cate = $(this).parents(".cate-box");
-        var idxI = cate.attr("data-cata-index");
-        var cell = $(this).parents(".cell-cont");
-        var idxJ = cell.attr("data-cell-index");
-        var val = cell.text().trim();
-
-        debugger;
-        if(this.checked) {
-            alone.dll[idxI].items[idxJ].enable = true;
-            alone.setDllData();
-            alone.render();
-        } else {
-            alone.dll[idxI].items[idxJ].enable = false;
-            alone.setDllData();
-            alone.render();
-        }
-    });
-
-
 });
