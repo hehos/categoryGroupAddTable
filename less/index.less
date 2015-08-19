@@ -1,4 +1,6 @@
 .config-goods {
+  input { width: auto; }
+  * { box-sizing: border-box; }
   ul, li {
     list-style: none;
     margin: 0;
@@ -24,7 +26,7 @@
       display: table;
     }
     &:after { clear: both; }
-    .cell-cont {
+    .cell-cont, .ctrl-form {
       float: left;
       width: 25%;
     }
@@ -35,14 +37,26 @@
       width: 4em;
     }
     .cell-edit { width: 8em; }
-    .cell-edit, .btn-add-cate {
+    .cell-edit, .btn-add-inputs {
       display: none;
     }
   }
-  .cell-cont {
+  .cell-cont, .ctrl-form {
+    padding: 5px 10px;
     input[type=checkbox] {
       margin-right: 3px;
     }
   }
+  .ctrl-form {
+    padding: 5px 0;
+  }
 
+  .cate-group-result {
+    td {
+      padding: 5px 10px;
+    }
+    input {
+      width: 100%;
+    }
+  }
 }

@@ -21,26 +21,35 @@
 
     <script id="config-template" type="text/html">
     <div class="config-goods">
-        {{# for(var i = 0, len = d.length; i < len; i++){ }}
-        <div class="cate-box">
+        {{#
+            var i, j, len;
+            var dll = d.dll;
+            var otherKey = d.otherKey;
+            var results = d.results;
+        }}
+        {{# for(i = 0, len = dll.length; i < len; i++) { }}
+        <div class="cate-box" data-cata-index="{{ i }}">
             <div class="pull-left">
-                <input class="cate-name" type="text" value="{{ d[i].name }}"/>
+                <input class="cate-name" type="text" value="{{ dll[i].name }}"/>
             </div>
             <ul class="items-cont col-md-3">
-                {{# for(var j = 0, len = d[i].items.length; j < len; j++){ }}
-                {{# var checked = d[i].items[j].enable; }}
-                <li class="cell-cont">
+                {{#
+                    for(j = 0, len = dll[i].items.length; j < len; j++) {
+                    var checked = dll[i].items[j].enable;
+                    var cell = dll[i].items[j];
+                }}
+                <li class="cell-cont" data-cell-index="{{ j }}">
                     <label>
                         <input type="checkbox" {{ checked ? "checked" : "" }} />
-                        <span style="display: {{ checked ? 'none;' : 'inline-block;' }}">{{ d[i].items[j].name }}</span>
-                        <input class="cell-edit" style="display: {{ checked ? 'inline-block;' : 'none;' }}" type="text"
-                               value="{{ d[i].items[j].name }}" />
+                        <span class="cell-txt" style="display: {{ checked ? 'none;' : 'inline-block;' }}">{{ cell.name }}</span>
+                        <input style="display: {{ checked ? 'inline-block;' : 'none;' }}"
+                               class="cell-edit" type="text" value="{{ cell.name }}" />
                     </label>
                 </li>
                 {{# } }}
 
                 <li class="ctrl-form">
-                    <div class="inputs">
+                    <div class="btn-add-inputs">
                         <input class="btn-add-input" type="text"/>
                         <button class="btn-confirm btn btn-info">确定</button>
                         <button class="btn-cancel btn btn-warning">取消</button>
@@ -58,30 +67,32 @@
             <table>
                 <thead>
                     <tr>
-                        {{# for(var i = 0, len = d.length; i < len; i++){ }}
-                        <th>{{ d[i].name }}</th>
+                        {{# for(i = 0, len = dll.length; i < len; i++){ }}
+                        <th>{{ dll[i].name }}</th>
                         {{# } }}
 
-                        <th><span>*</span>市场价<i class="glyphicon glyphicon-pencil"></i></th>
-                        <th><span>*</span>价格<i class="glyphicon glyphicon-pencil"></i></th>
-                        <th><span>*</span>库存<i class="glyphicon glyphicon-pencil"></i></th>
-                        <th><span>*</span>预警值<i class="glyphicon glyphicon-pencil"></i></th>
-                        <th>商家货号</th>
+                        {{# for(i = 0, len = otherKey.length; i < len; i++){ }}
+                        <th><span>*</span>{{ otherKey[i] }}<i class="glyphicon glyphicon-pencil"></i></th>
+                        {{# } }}
                     </tr>
                 </thead>
                 <tbody>
+                    {{# for(i = 0, len = results.length; i < len; i++){ }}
                     <tr>
-                        <td>红色</td>
-                        <td>市场价</td>
-                        <td><input type="text"/></td>
-                        <td><input type="text"/></td>
+                        {{#
+                            var cells = results[i];
+                            for(j = 0, len = cells.length; j < len; j++) {
+                        }}
+                        <td>{{# if(j < 3) { }}
+                            {{ cells[j] }}
+                            {{# } else { }}
+                            <input type="text" value="{{ cells[j] }}"/>
+                            {{# } }}
+                        </td>
+                        {{# } }}
                     </tr>
-                    <tr>
-                        <td>红色</td>
-                        <td>价格</td>
-                        <td></td>
-                        <td></td>
-                    </tr>
+                    {{# } }}
+
                 </tbody>
             </table>
         </div>
@@ -91,12 +102,6 @@
 
     </div>
 </div>
-
-<script>
-    var alone = new Alone();
-
-    alone.render();
-</script>
 
 </body>
 </html>

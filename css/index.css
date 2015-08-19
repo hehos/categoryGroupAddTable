@@ -1,3 +1,9 @@
+.config-goods input {
+  width: auto;
+}
+.config-goods * {
+  box-sizing: border-box;
+}
 .config-goods ul,
 .config-goods li {
   list-style: none;
@@ -28,7 +34,8 @@
 .config-goods .items-cont:after {
   clear: both;
 }
-.config-goods .items-cont .cell-cont {
+.config-goods .items-cont .cell-cont,
+.config-goods .items-cont .ctrl-form {
   float: left;
   width: 25%;
 }
@@ -42,9 +49,23 @@
   width: 8em;
 }
 .config-goods .items-cont .cell-edit,
-.config-goods .items-cont .btn-add-cate {
+.config-goods .items-cont .btn-add-inputs {
   display: none;
 }
-.config-goods .cell-cont input[type=checkbox] {
+.config-goods .cell-cont,
+.config-goods .ctrl-form {
+  padding: 5px 10px;
+}
+.config-goods .cell-cont input[type=checkbox],
+.config-goods .ctrl-form input[type=checkbox] {
   margin-right: 3px;
+}
+.config-goods .ctrl-form {
+  padding: 5px 0;
+}
+.config-goods .cate-group-result td {
+  padding: 5px 10px;
+}
+.config-goods .cate-group-result input {
+  width: 100%;
 }

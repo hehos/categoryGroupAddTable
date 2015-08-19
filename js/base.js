@@ -11,7 +11,7 @@ window.Alone = function() {
             items : [
                 {'name' : 'red', 'enable' : true},
                 {'name' : 'green', 'enable' : true},
-                {'name' : 'orange', 'enable' : false}
+                {'name' : 'orange', 'enable' : true}
             ]
         },
         {
@@ -31,8 +31,10 @@ window.Alone = function() {
             ]
         }
     ];
+    this.otherKey = ["市场价", "价格", "库存", "预警值", "商家货号"];
+
     this.dllData = [
-        ['red',  'green'],
+        ['red',  'green', 'orange'],
         ['spec1',  'spec2'],
         ['size1',  'size2']
     ];
@@ -40,25 +42,43 @@ window.Alone = function() {
         '0_0_0' :  {'price' : '100', 'price2' : '101'},
         '0_0_1' :  {'price' : '200', 'price2' : '201'}
     };
+
+    this.results = [];
 }
 // 方法
 Alone.prototype.loopN = function(data, values) {
+    var other = this;
     var head = '';
-    var n = data.length, stack = [];
+    var n = data.length,
+        stack = [];
     var html = '';
+    var results = [];
     var render = function(l) {
-        var i;
         if(l == n){
-            var row = '', key = '';
-            for(i = 0; i < n; i++) {
+            var resultEle = [];
+            for(var i = 0; i < stack.length; i++) {
+                resultEle.push(stack[i].value);
+            }
+
+            var key = '';
+            for(var i = 0; i < n; i++) {
                 key += '_' + stack[i].index;
-                row += '<td>' + stack[i].value + '</td>';
             }
             key = key.replace(/^_/, '');
-            html += "<tr>" +  row + "\n";
-            html += "<td><input type='text' value='" + (values[key] ? values[key].price : '') + "'></td>";
-            html += "<td><input type='text' value='" + (values[key] ? values[key].price2 : '') + "'></td>";
-            html += "</tr>";
+
+            var vals = values[key];
+            var otherVal = [];
+            if(vals) {
+                for (key in vals) {
+                    otherVal.push(vals[key]);
+                }
+            }
+            for(var i = 0; i < other.otherKey.length; i++) {
+                var otherCellVal = otherVal[i];
+                otherCellVal? resultEle.push(otherVal[i]) : resultEle.push(" ");
+            }
+
+            results.push(resultEle);
             return;
         }
 
@@ -69,15 +89,18 @@ Alone.prototype.loopN = function(data, values) {
         }
     }
     render(0);
-    return "<table class='table'>" + html + "</table>";
+    this.results = results;
+    console.log(this.results);
 }
-Alone.prototype.render = function(dom) {
-    var dll = this.dll;
+Alone.prototype.render = function() {
+    var other = this;
+    this.loopN(this.dllData, this.values);
+
+
     var gettpl = document.getElementById('config-template').innerHTML;
-    laytpl(gettpl).render(dll, function(html){
+    laytpl(gettpl).render(other, function(html){
         document.getElementById('config-view').innerHTML = html;
     });
-    $(".cate-group-result tbody").html(this.loopN(this.dllData, this.values));
 }
 
 Alone.prototype.setDll = function(dll) {
